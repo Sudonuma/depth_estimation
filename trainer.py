@@ -28,7 +28,7 @@ import datasets
 import networks
 from IPython import embed
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = "1"
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 #experiment = Experiment(api_key="l6NAe3ZOaMzGNsrPmy78yRnEv", project_name="monodepth2", workspace="tehad", auto_metric_logging=False)
 experiment = Experiment(api_key="l6NAe3ZOaMzGNsrPmy78yRnEv", project_name="monodepth2-checkpoint", workspace="tehad", auto_metric_logging=False)

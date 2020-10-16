@@ -16,10 +16,10 @@ opts = options.parse()
 
 
 if __name__ == "__main__":
-    torch.backends.cudnn.deterministic = True
-    random.seed(2)
-    torch.manual_seed(2)
-    torch.cuda.manual_seed(2)
+    #torch.backends.cudnn.deterministic = True
+    #random.seed(2)
+    #torch.manual_seed(2)
+    #torch.cuda.manual_seed(2)
     #experiment = Experiment(api_key="l6NAe3ZOaMzGNsrPmy78yRnEv", project_name="depth2", workspace="tehad")
     trainer = Trainer(opts)
     trainer.train()

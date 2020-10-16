@@ -194,58 +194,25 @@ class MonoDataset(data.Dataset):
 
         do_color_aug = self.is_train and random.random() > 0.5
         do_flip = self.is_train and random.random() > 0.5
-        #print('this is the index',index)
-        #print('filename is',self.filenames)
-        line = self.filenames[index].split()
-        print(line)
-        #print(line, 'this is line')
-        #print(self.gt_filenames, 'gt filenames')
-        #print(index)
+        line = self.filenames[index].split() 
+        #print("index",index)
+        #print("self.gt_filenames",len(self.gt_filenames))
+        #print("self.filenames",len(self.filenames))
         line_gt = self.gt_filenames[index].split()
-        # print(line_gt, 'this is ground truth line')
-        # print('line format is', line)
-        #check if you have ground truth for that specefic image
         filenames_list = []
-        # print(self.gt_filenames, 'grounf truht filenames')
         for idx, i in enumerate(self.gt_filenames):
             filenames_list.append(i.split())
-        # print(filenames_list)
 
         files = np.asarray(filenames_list)
         list_of_files = files[:,1]
-        # print('list of existant ground truth values',list_of_files)
-        #print('list of files is',list_of_files)
-        #print('file is ',line[1])
-        #if str(line[1]) in list_of_files:
-        #    print("ok")
-        #else:
-            #print("not ok")
-        #check if you have ground truth for that specefic image
-
-
-        #print(index,':index is')
-        #print(self.gt_filenames, ': gt filenames')
-        ##############################################gt_line = self.gt_filenames[index].split()
-        
-        #print('line is', line)
-        #print()
         folder = line[0]
         folder_gt = line_gt[0]
         ####################################gt_folder = gt_line[0]
         self.file_number = int(line[1])
         self.file_number_gt = int(line_gt[1])
-        #####################################self.file_number_gt = int(gt_line[1])
-        #print('ground truth file number', self.file_number_gt, 'gt folder', gt_folder)
-        #print("file number", self.file_number, "folder", folder)
-        #if self.file_number == self.file_number_gt:
-         #   print('file exists: gt file = ', self.file_number_gt, 'file = ', self.file_number)
-        #else:
-        #    print('file does noy exists: file = ', self.file_number)
         self.folder = folder
         self.folder_gt = folder_gt
-        #print('this is self folder in monodataset class',self.folder)
-        #print("folder is", folder)
-        #print('filenumber is', self.file_number)
+
         if len(line) == 3:
             frame_index = int(line[1])
             frame_index_gt = int(line_gt[1])
@@ -267,50 +234,22 @@ class MonoDataset(data.Dataset):
 
         
         for i in self.frame_idxs:
-            #inputs[("ground_truth", i, -1)] = self.get_gtdepth(folder, frame_index + i, side, do_flip)
-            value = int(line[1])+int(i)
-            # print('value of (int(line[1])+int(i))  ', value)
-            # print(list_of_files)
-            # files
-            # print(folder, 'folder is ',value ,'vaklue value ', side ,'side is')
+            value = int(line[1])+int(i) 
             compvalue = [folder, frame_index + i, side]
-            # print(compvalue, 'compvalue ')
             l =  compvalue == files
-            # print((l.all(axis=1)).any(),'exits of not')
-            # if (l.all(axis=1)).any() == False:
-                # print(frame_index + i, 'no grpound truth for this')
-            # print(l, 'l is this array')
-            # l = x[0] == ['5','978','r']
-            # print(files[value], 'files de value is')
-            # if ()
-            # arr = files[value] == [folder , str(value) , side]
             if (l.all(axis=1)).any():
-
-                # print('this is line[1]' ,line[1], 'this is frame index', frame_index )
-                # print("ok")
                 inputs[("ground_truth", i, -1)] = self.get_gtdepth(folder, frame_index + i, side, do_flip)
             else:
-                # print('not ok')
                 x = np.zeros((1920,1080))
                 inputs[("ground_truth", i, -1)] = Image.fromarray(x)
          
         for i in self.frame_idxs:
                 inputs[("mask", i, -1)] = self.get_seg_mask(folder, frame_index + i, side, do_flip)
-        ########################################################
 
-
-
-            #print(inputs[("ground_truth", i, -1)].size, "size of ground truth as PIL")
-        # adjusting intrinsics to match each scale in the pyramid
         for scale in range(self.num_scales):
             K = self.K.copy()
-
-            #K[0, :] *= self.width // (2 ** scale)
-            #K[1, :] *= self.height // (2 ** scale)
-            # print('insode mono K', K[:, 0, :])
             K[:, 0, :] *= self.width // (2 ** scale)
             K[:, 1, :] *= self.height // (2 ** scale)
-            # print('K after rescaling', K[:, 0, :])
 
             inv_K = np.linalg.pinv(K)
 
@@ -331,13 +270,6 @@ class MonoDataset(data.Dataset):
             del inputs[("ground_truth", i, -1)]
             del inputs[("mask", i, -1)]
 
-        # if self.load_depth:
-        #     depth_gt = self.get_depth(folder, frame_index, side, do_flip)
-        #     # print(depth_gt)
-        #     inputs["depth_gt"] = np.expand_dims(depth_gt, 0)
-        #     inputs["depth_gt"] = torch.from_numpy(inputs["depth_gt"].astype(np.float32))
-            # print(inputs["depth_gt"].size())
-
         if "s" in self.frame_idxs:
             stereo_T = np.eye(4, dtype=np.float32)
             baseline_sign = -1 if do_flip else 1
@@ -347,8 +279,7 @@ class MonoDataset(data.Dataset):
             inputs["stereo_T"] = torch.from_numpy(stereo_T)
         inputs["target_folder"] = folder
         inputs["target_file"] = self.file_number
-        # for key, ipt in inputs.items():
-        #     print(key)
+
         return inputs
 
     def return_folder(self, folder):
@@ -361,14 +292,4 @@ class MonoDataset(data.Dataset):
         raise NotImplementedError
 
     def get_depth(self, folder, frame_index, side, do_flip):
-        # #f_str = "{:010d}{}".format(frame_index, self.img_ext)
-        # # f_str = str(frame_index)+str(self.img_ext)
-        # f_str = str(frame_index)+".npy"
-        # depth_path = os.path.join(
-        #     self.data_path, folder, "image_0{}/groundtruth/depth_map/npy/".format(self.side_map[side]), f_str)
-        
-        # print("from mono dataset ",depth_path)
-        # # if you return the depth path 
-        # # better return the depth itself
-        # return depth_path
         raise NotImplementedError
